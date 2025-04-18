@@ -1,0 +1,10 @@
+FROM ubuntu:24.04
+
+ENV PATH="/usr/local/go/bin:${PATH}"
+
+RUN apt-get update -y && apt-get install -y make clang llvm libbpf-dev curl wget \
+    && wget https://go.dev/dl/go1.24.2.linux-amd64.tar.gz \
+    && tar -C /usr/local -xzf go1.24.2.linux-amd64.tar.gz \
+    && curl -sSL https://github.com/bufbuild/buf/releases/latest/download/buf-Linux-x86_64 -o /usr/local/bin/buf \
+    && chmod +x /usr/local/bin/buf \
+    && apt-get install -y protoc-gen-go protoc-gen-go-grpc

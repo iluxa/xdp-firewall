@@ -1,0 +1,62 @@
+/*
+ * Copyright (C) 2025 Ilya Gavrilov <gilyav@gmail.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// firewall.proto
+syntax = "proto3";
+
+package firewall;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "pkg/proto";
+
+service Firewall {
+  rpc AddRule(Rule) returns (google.protobuf.Empty);
+  rpc DeleteRule(Rule) returns (google.protobuf.Empty);
+  rpc DeleteAllRules(google.protobuf.Empty) returns (google.protobuf.Empty);
+  rpc ListRules(google.protobuf.Empty) returns (RuleList);
+}
+
+enum Action {
+  ACCEPT = 0;
+  DROP = 1;
+}
+
+message Rule {
+  optional CIDR src_ip = 1;
+  optional CIDR dst_ip = 2;
+  optional uint32 protocol = 3; // L4 proto
+  optional uint32 src_port = 4;
+  optional uint32 dst_port = 5;
+  Action action = 6;
+  uint32 priority = 7;
+}
+
+message RuleOut {
+  Rule rule = 1;
+  uint64 packets = 2;
+  uint64 bytes = 3;
+}
+
+message RuleList {
+  repeated RuleOut rules = 1;
+}
+
+message CIDR {
+  bytes ip = 1;        // IPv4 (4 bytes) or IPv6 (16 bytes)
+  uint32 prefix = 2;   // CIDR prefix length (0-32 for IPv4, 0-128 for IPv6)
+}
